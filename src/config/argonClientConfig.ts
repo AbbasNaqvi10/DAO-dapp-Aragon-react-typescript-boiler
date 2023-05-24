@@ -1,17 +1,19 @@
-import { Wallet } from "@ethersproject/wallet";
 import { Context, ContextParams } from "@aragon/sdk-client";
+import { Client } from "@aragon/sdk-client";
+import { Signer } from "@ethersproject/abstract-signer";
+
 // import { getWalletClient } from "wagmi/actions";
 
 // Set up your IPFS API key. You can get one either by running a local node or by using a service like Infura or Alechmy.
 // Make sure to always keep these private in a file that is not committed to your public repository.
 export const IPFS_API_KEY: string = "ipfs-api-key";
 
-export const contextParams: ContextParams = {
+export const getContextParams = (signer: Signer): ContextParams => ({
   // Choose the network you want to use. You can use "goerli" or "mumbai" for testing, "mainnet" for Ethereum.
   network: "goerli",
 
   // Depending on how you're configuring your wallet, you may want to pass in a `signer` object here.
-  // signer: new Wallet(signer? signer : undefined),
+  signer: signer,
   // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
   // Pass the address of the  `DaoFactory` contract you want to use. You can find it here based on your chain of choice: https://github.com/aragon/core/blob/develop/active_contracts.json
   daoFactoryAddress: "0x16B6c6674fEf5d29C9a49EA68A19944f5a8471D3",
@@ -34,7 +36,7 @@ export const contextParams: ContextParams = {
       url: "https://subgraph.satsuma-prod.com/aragon/core-goerli/api",
     },
   ],
-};
+});
 
 // Bare minimoum context that will use de default values
 const minimalContextParams: ContextParams = {
@@ -43,6 +45,13 @@ const minimalContextParams: ContextParams = {
 };
 
 // Instantiate the Aragon SDK context
-export const context: Context = new Context({ ...contextParams });
-// Instantiate the Aragon SDK context
 export const minimalContext: Context = new Context(minimalContextParams);
+
+export const initClient = (signer: Signer) => {
+  const contextParams = getContextParams(signer);
+
+  // Instantiate the Aragon SDK context
+  const context: Context = new Context({ ...contextParams });
+  const client: Client = new Client(context);
+  return { context, client };
+};

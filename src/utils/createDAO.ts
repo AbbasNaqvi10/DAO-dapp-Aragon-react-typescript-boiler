@@ -5,12 +5,11 @@ import {
   GasFeeEstimation,
   MultisigClient,
   MultisigPluginInstallParams,
+  Client,
 } from "@aragon/sdk-client";
-import { client } from "./client";
 import axios from "axios";
-import { JsonRpcSigner } from "ethers";
 
-export const createDAO = async (signer: JsonRpcSigner | undefined) => {
+export const createDAO = async (client: Client) => {
   // Addresses which will be allowed to vote in the Multisig plugin.
   const members: string[] = [
     "0xe3be75e256a92725Ae82E8FB72AE7794382f4F11",
@@ -28,7 +27,7 @@ export const createDAO = async (signer: JsonRpcSigner | undefined) => {
   };
 
   // Encodes the parameters of the Multisig plugin. These will get used in the installation plugin for the DAO.
-  const multisigPluginInstallItem = MultisigClient.encoding.getPluginInstallItem(multisigPluginIntallParams);
+  const multisigPluginInstallItem = MultisigClient.encoding.getPluginInstallItem(multisigPluginIntallParams, "goerli");
 
   // Pin metadata to IPFS, returns IPFS CID string.
   const metadata: DaoMetadata = {
@@ -73,9 +72,11 @@ export const createDAO = async (signer: JsonRpcSigner | undefined) => {
 
   const createParams: CreateDaoParams = {
     metadataUri,
-    ensSubdomain: "dsjfkbjksjf", // my-org.dao.eth
+    ensSubdomain: "daooaabbas123", // my-org.dao.eth
     plugins: [multisigPluginInstallItem],
   };
+
+  console.log("before estimation");
 
   // Estimate gas for the transaction.
   const estimatedGas: GasFeeEstimation = await client.estimation.createDao(createParams);

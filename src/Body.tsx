@@ -9,23 +9,23 @@ import useBalances from "./hooks/useBalances";
 interface IProps {}
 
 const Body: React.FC<IProps> = () => {
-  const { reloadDecimals } = useDecimals();
-  const { reloadBalances } = useBalances();
+  // const { reloadDecimals } = useDecimals();
+  // const { reloadBalances } = useBalances();
 
-  useEffect(() => {
-    reloadDecimals();
-  }, [reloadDecimals]);
+  // useEffect(() => {
+  //   reloadDecimals();
+  // }, [reloadDecimals]);
 
-  useEffect(() => {
-    reloadBalances();
-    const int = setInterval(() => {
-      reloadBalances();
-    }, 30000); // 30 seconds refetch interval
+  // useEffect(() => {
+  //   reloadBalances();
+  //   const int = setInterval(() => {
+  //     reloadBalances();
+  //   }, 30000); // 30 seconds refetch interval
 
-    return () => {
-      clearInterval(int);
-    };
-  }, [reloadBalances]);
+  //   return () => {
+  //     clearInterval(int);
+  //   };
+  // }, [reloadBalances]);
 
   return (
     <Routes>
@@ -38,3 +38,4 @@ const Body: React.FC<IProps> = () => {
 };
 
 export default Body;
+

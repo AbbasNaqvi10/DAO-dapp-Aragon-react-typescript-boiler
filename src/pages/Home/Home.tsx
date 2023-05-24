@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Container, Typography, ListItemText, ListItem, Button, Skeleton } from "@mui/material";
 import { providers } from "ethers";
 import { Link } from "react-router-dom";
@@ -9,6 +9,7 @@ import { toEth } from "src/utils/common";
 import { dismissNotifyAll, notifyError, notifyLoading, notifySuccess } from "src/api/notifications";
 import { multisignClient } from "src/utils/multisignClient";
 import { createDAO } from "src/utils/createDAO";
+import { initClient } from "src/config/argonClientConfig";
 
 interface IProps {}
 
@@ -18,7 +19,13 @@ const Home: React.FC<IProps> = () => {
   // const { decimals } = useDecimals();
   const { signer } = useWallet();
 
-  createDAO(signer);
+  useEffect(() => {
+    if (signer)
+      (async function () {
+        const { client } = initClient(signer);
+        await createDAO(client);
+      })();
+  }, [signer]);
 
   return (
     <Container maxWidth="xl">

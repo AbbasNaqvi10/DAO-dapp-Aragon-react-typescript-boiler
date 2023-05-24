@@ -14,7 +14,7 @@ import {
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { truncateAddress } from "src/utils/common";
 import { FetchBalanceResult } from "wagmi/actions";
-import { BrowserProvider, JsonRpcSigner } from "ethers";
+import { providers, Signer } from "ethers";
 
 interface IWalletContext {
   /**
@@ -51,7 +51,7 @@ interface IWalletContext {
   balance: FetchBalanceResult | undefined;
   switchNetworkAsync: ((chainId_?: number | undefined) => Promise<Chain>) | undefined;
   chains: Chain[];
-  signer?: JsonRpcSigner;
+  signer?: Signer;
 }
 
 export const WalletContext = React.createContext<IWalletContext>({} as IWalletContext);
@@ -65,7 +65,7 @@ const WalletProvider: React.FC<IProps> = ({ children }) => {
   const publicClient = usePublicClient();
   const { switchNetworkAsync, chains } = useSwitchNetwork();
   const { address: currentAddress, connector } = useAccount();
-  const [signer, setSigner] = React.useState<JsonRpcSigner | undefined>();
+  const [signer, setSigner] = React.useState<Signer | undefined>();
 
   const { disconnect } = useDisconnect();
   const { chain } = useNetwork();
@@ -100,9 +100,11 @@ const WalletProvider: React.FC<IProps> = ({ children }) => {
   React.useEffect(() => {
     (async function () {
       try {
-        const provider = await connector?.getProvider();
-        const _provider = new BrowserProvider(provider);
-        const _signer = await _provider.getSigner();
+        const _provider = await connector?.getProvider();
+        const provider = new providers.Web3Provider(_provider);
+        await provider.send("eth_requestAccounts", []);
+
+        const _signer = provider.getSigner();
         if (_signer) {
           setSigner(_signer);
         } else {
@@ -112,7 +114,7 @@ const WalletProvider: React.FC<IProps> = ({ children }) => {
         setSigner(undefined);
       }
     })();
-  }, [connector]);
+  }, [connector, chainId]);
 
   return (
     <WalletContext.Provider
