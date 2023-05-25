@@ -9,7 +9,7 @@ import { WagmiConfig } from "wagmi";
 import { chains, wagmiConfig } from "./config/walletConfig";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import WalletProvider from "./context/WalletProvider";
-// import viteLogo from "/vite.svg";
+import { AragonSDKWrapper } from "./context/AragonProvider";
 
 function App() {
   return (
@@ -21,7 +21,9 @@ function App() {
             <WagmiConfig config={wagmiConfig}>
               <RainbowKitProvider chains={chains}>
                 <WalletProvider>
-                  <Body />
+                  <AragonSDKWrapper>
+                    <Body />
+                  </AragonSDKWrapper>
                 </WalletProvider>
               </RainbowKitProvider>
             </WagmiConfig>
@@ -33,5 +35,4 @@ function App() {
 }
 
 export default App;
-
 
