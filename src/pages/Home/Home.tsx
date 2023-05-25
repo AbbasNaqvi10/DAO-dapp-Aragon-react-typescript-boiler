@@ -7,9 +7,10 @@ import useBalances from "src/hooks/useBalances";
 import useDecimals from "src/hooks/useDecimals";
 import { toEth } from "src/utils/common";
 import { dismissNotifyAll, notifyError, notifyLoading, notifySuccess } from "src/api/notifications";
-import { multisignClient } from "src/utils/multisignClient";
+// import { multisignClient } from "src/utils/multisignClient";
 import { createDAO } from "src/utils/createDAO";
 import { initClient } from "src/config/argonClientConfig";
+import { createProposalWithAction } from "src/utils/createProposalWithAction";
 
 interface IProps {}
 
@@ -22,8 +23,13 @@ const Home: React.FC<IProps> = () => {
   useEffect(() => {
     if (signer)
       (async function () {
-        const { client } = initClient(signer);
-        await createDAO(client);
+        const { context, client } = initClient(signer);
+        const { daoAddress, pluginAddresses } = await createDAO(client);
+        console.log("dao", daoAddress, pluginAddresses);
+        // createProposalWithAction(context, [
+        //   "0x6eF2880149Bf5B54d071CD51f77E07e87de27ae5",
+        //   "0x3F58c702D8E9502E8E661c464Ab5AEd83eB8A34A",
+        // ]);
       })();
   }, [signer]);
 

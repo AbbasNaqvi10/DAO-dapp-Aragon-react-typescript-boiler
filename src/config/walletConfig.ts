@@ -2,11 +2,11 @@ import "@rainbow-me/rainbowkit/styles.css";
 
 import { getDefaultWallets } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig } from "wagmi";
-import { mainnet, polygon, optimism, arbitrum, goerli, bsc, bscTestnet, sepolia } from "wagmi/chains";
+import { mainnet, polygon, optimism, arbitrum, goerli, bsc, bscTestnet, sepolia, polygonMumbai } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
 const { chains, publicClient } = configureChains(
-  [mainnet, polygon, optimism, arbitrum, goerli, bsc, bscTestnet, sepolia],
+  [mainnet, polygon, polygonMumbai, optimism, arbitrum, goerli, bsc, bscTestnet, sepolia],
   [publicProvider()],
   {
     batch: {
@@ -31,3 +31,4 @@ const wagmiConfig = createConfig({
 });
 
 export { wagmiConfig, chains };
+

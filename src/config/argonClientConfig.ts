@@ -10,15 +10,15 @@ export const IPFS_API_KEY: string = "ipfs-api-key";
 
 export const getContextParams = (signer: Signer): ContextParams => ({
   // Choose the network you want to use. You can use "goerli" or "mumbai" for testing, "mainnet" for Ethereum.
-  network: "goerli",
+  network: 80001,
 
   // Depending on how you're configuring your wallet, you may want to pass in a `signer` object here.
   signer: signer,
   // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
   // Pass the address of the  `DaoFactory` contract you want to use. You can find it here based on your chain of choice: https://github.com/aragon/core/blob/develop/active_contracts.json
-  daoFactoryAddress: "0x16B6c6674fEf5d29C9a49EA68A19944f5a8471D3",
+  daoFactoryAddress: "0x3ff1681f31f68Ff2723d25Cf839bA7500FE5d218",
   // Choose your Web3 provider: Cloudfare, Infura, Alchemy, etc.
-  web3Providers: ["https://rpc.ankr.com/eth_goerli"],
+  web3Providers: ["https://rpc.ankr.com/polygon_mumbai"],
   ipfsNodes: [
     {
       url: "https://api.pinata.cloud/",
@@ -38,20 +38,15 @@ export const getContextParams = (signer: Signer): ContextParams => ({
   ],
 });
 
-// Bare minimoum context that will use de default values
-const minimalContextParams: ContextParams = {
-  network: "mainnet",
-  web3Providers: "https://eth.llamarpc.com",
-};
-
 // Instantiate the Aragon SDK context
-export const minimalContext: Context = new Context(minimalContextParams);
+
+export let context: Context;
 
 export const initClient = (signer: Signer) => {
   const contextParams = getContextParams(signer);
-
+  console.log(signer, contextParams);
   // Instantiate the Aragon SDK context
-  const context: Context = new Context({ ...contextParams });
+  context = new Context({ ...contextParams });
   const client: Client = new Client(context);
   return { context, client };
 };
