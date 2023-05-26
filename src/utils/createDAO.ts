@@ -95,7 +95,7 @@ export const createDAO = async (client: Client) => {
 
   // Pin metadata to IPFS, returns IPFS CID string.
   const metadata: DaoMetadata = {
-    name: "dechainsss DAO",
+    name: "dechainsss DAO" + Math.floor(Math.random() * 42069),
     description: "This is a description",
     avatar: "image-url",
     links: [

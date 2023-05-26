@@ -3410,6 +3410,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "dapp-react-typescript-boiler@workspace:."
   dependencies:
+    "@aragon/osx-ethers": ^1.2.1
     "@aragon/sdk-client": ^1.8.1
     "@emotion/react": ^11.11.0
     "@emotion/styled": ^11.11.0
