@@ -101,6 +101,11 @@ export const createProposalWithAction = async (context: Context, pluginAddresses
     creatorVote: VoteValues.YES, // default NO, other options: ABSTAIN, YES
   };
 
+  // Get the token details used in the TokenVoting plugin for a given DAO.
+  // ERC721 Token coming soon!
+  const tokenDetails = await tokenVotingClient.methods.getToken(pluginAddresses[1]);
+  console.log("Token details", tokenDetails);
+
   // Creates a proposal using the token voting governance mechanism, which executes with the parameters set in the configAction object.
   const steps = tokenVotingClient.methods.createProposal(proposalParams);
   let proposalId: string | undefined;

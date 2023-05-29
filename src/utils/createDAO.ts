@@ -35,64 +35,65 @@ export const createDAO = async (client: Client) => {
 
   // You can do different types of installations, depending on your needs.
   // For ex, these would be the plugin params if you want to use an already-existing ERC20 token.
-  const tokenVotingPluginInstallParams1: TokenVotingPluginInstall = {
-    votingSettings: {
-      minDuration: 60 * 60 * 24 * 2, // seconds (minimum amount is 3600)
-      minParticipation: 0.25, // 25%
-      supportThreshold: 0.5, // 50%
-      minProposerVotingPower: BigInt("5000"), // default 0
-      votingMode: VotingMode.STANDARD, // default standard, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
-    },
-    useToken: {
-      tokenAddress: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889", // contract address of the token to use as the voting token
-      wrappedToken: {
-        name: "Wrapper Matic", // the name of your token
-        symbol: "WMATIC", // the symbol for your token. shouldn't be more than 5 letters
-      },
-    },
-  };
-
-  // // These would be the plugin params if you need to mint a new token for the DAO to enable TokenVoting.
-  // const tokenVotingPluginInstallParams2: TokenVotingPluginInstall = {
+  // const tokenVotingPluginInstallParams1: TokenVotingPluginInstall = {
   //   votingSettings: {
   //     minDuration: 60 * 60 * 24 * 2, // seconds (minimum amount is 3600)
   //     minParticipation: 0.25, // 25%
   //     supportThreshold: 0.5, // 50%
   //     minProposerVotingPower: BigInt("5000"), // default 0
-  //     votingMode: VotingMode.EARLY_EXECUTION, // default is STANDARD. other options: EARLY_EXECUTION, VOTE_REPLACEMENT
+  //     votingMode: VotingMode.STANDARD, // default standard, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
   //   },
-  //   newToken: {
-  //     name: "Wrapped Matic", // the name of your token
-  //     symbol: "WMATIC", // the symbol for your token. shouldn't be more than 5 letters
-  //     decimals: 18, // the number of decimals your token uses
-  //     minter: "0x6c844CAdCd636130397f3d44796045d8BB4A70Dc", // optional. if you don't define any, we'll use the standard OZ ERC20 contract. Otherwise, you can define your own token minter contract address.
-  //     balances: [
-  //       {
-  //         // Defines the initial balances of the new token
-  //         address: "0x6c844CAdCd636130397f3d44796045d8BB4A70Dc", // address of the account to receive the newly minted tokens
-  //         balance: BigInt(10), // amount of tokens that address should receive
-  //       },
-  //       {
-  //         address: "0x283070d8D9ff69fCC9f84afE7013C1C32Fd5A19F",
-  //         balance: BigInt(10),
-  //       },
-  //       {
-  //         address: "0xe3be75e256a92725Ae82E8FB72AE7794382f4F11",
-  //         balance: BigInt(10),
-  //       },
-  //     ],
+  //   useToken: {
+  //     tokenAddress: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889", // contract address of the token to use as the voting token
+  //     wrappedToken: {
+  //       name: "Wrapper Matic", // the name of your token
+  //       symbol: "WMATIC", // the symbol for your token. shouldn't be more than 5 letters
+  //     },
   //   },
   // };
 
+  // // These would be the plugin params if you need to mint a new token for the DAO to enable TokenVoting.
+  const tokenVotingPluginInstallParams2: TokenVotingPluginInstall = {
+    votingSettings: {
+      minDuration: 60 * 60 * 24 * 2, // seconds (minimum amount is 3600)
+      minParticipation: 0.25, // 25%
+      supportThreshold: 0.5, // 50%
+      // minProposerVotingPower: BigInt("5000"), // default 0
+      votingMode: VotingMode.EARLY_EXECUTION, // default is STANDARD. other options: EARLY_EXECUTION, VOTE_REPLACEMENT
+    },
+    newToken: {
+      name: "Wrapped Token", // the name of your token
+      symbol: "WTK", // the symbol for your token. shouldn't be more than 5 letters
+      decimals: 18, // the number of decimals your token uses
+      minter: "0x6c844CAdCd636130397f3d44796045d8BB4A70Dc", // optional. if you don't define any, we'll use the standard OZ ERC20 contract. Otherwise, you can define your own token minter contract address.
+      balances: [
+        {
+          // Defines the initial balances of the new token
+          address: "0x6c844CAdCd636130397f3d44796045d8BB4A70Dc", // address of the account to receive the newly minted tokens
+          balance: BigInt(100), // amount of tokens that address should receive
+        },
+        {
+          address: "0x283070d8D9ff69fCC9f84afE7013C1C32Fd5A19F",
+          balance: BigInt(10),
+        },
+        {
+          address: "0xe3be75e256a92725Ae82E8FB72AE7794382f4F11",
+          balance: BigInt(10),
+        },
+      ],
+    },
+  };
+
   // Creates a TokenVoting plugin client with the parameteres defined above (with an existing token).
-  const tokenVotingPluginInstallItem1 = TokenVotingClient.encoding.getPluginInstallItem(
-    tokenVotingPluginInstallParams1,
+  // const tokenVotingPluginInstallItem1 = TokenVotingClient.encoding.getPluginInstallItem(
+  //   tokenVotingPluginInstallParams1,
+  //   80001
+  // );
+  // // Creates a TokenVoting plugin client with the parameteres defined above (with newly minted tokens).
+  const tokenVotingPluginInstallItem2 = TokenVotingClient.encoding.getPluginInstallItem(
+    tokenVotingPluginInstallParams2,
     80001
   );
-  // // Creates a TokenVoting plugin client with the parameteres defined above (with newly minted tokens).
-  // const tokenVotingPluginInstallItem2 = TokenVotingClient.encoding.getPluginInstallItem(
-  //   tokenVotingPluginInstallParams2
-  // );
 
   // Pin metadata to IPFS, returns IPFS CID string.
   const metadata: DaoMetadata = {
@@ -138,7 +139,7 @@ export const createDAO = async (client: Client) => {
   const createParams: CreateDaoParams = {
     metadataUri,
     ensSubdomain: "votingdao" + Math.floor(Math.random() * 42069), // my-org.dao.eth
-    plugins: [multisigPluginInstallItem, tokenVotingPluginInstallItem1],
+    plugins: [multisigPluginInstallItem, tokenVotingPluginInstallItem2],
   };
 
   console.log("before estimation", createParams);
