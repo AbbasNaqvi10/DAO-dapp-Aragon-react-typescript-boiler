@@ -19,6 +19,7 @@ export const createDAO = async (client: Client) => {
     "0x4BB89b62F7171d172D61AE01311633A5C7848F28",
     "0x34D2e950a33dbCB4D8FbcfcA51811FFB34BeC66F",
     "0x283070d8D9ff69fCC9f84afE7013C1C32Fd5A19F",
+    "0x6c844CAdCd636130397f3d44796045d8BB4A70Dc",
   ];
 
   const multisigPluginIntallParams: MultisigPluginInstallParams = {
@@ -61,22 +62,22 @@ export const createDAO = async (client: Client) => {
   //     votingMode: VotingMode.EARLY_EXECUTION, // default is STANDARD. other options: EARLY_EXECUTION, VOTE_REPLACEMENT
   //   },
   //   newToken: {
-  //     name: "Token", // the name of your token
-  //     symbol: "TOK", // the symbol for your token. shouldn't be more than 5 letters
+  //     name: "Wrapped Matic", // the name of your token
+  //     symbol: "WMATIC", // the symbol for your token. shouldn't be more than 5 letters
   //     decimals: 18, // the number of decimals your token uses
-  //     minter: "0x...", // optional. if you don't define any, we'll use the standard OZ ERC20 contract. Otherwise, you can define your own token minter contract address.
+  //     minter: "0x6c844CAdCd636130397f3d44796045d8BB4A70Dc", // optional. if you don't define any, we'll use the standard OZ ERC20 contract. Otherwise, you can define your own token minter contract address.
   //     balances: [
   //       {
   //         // Defines the initial balances of the new token
-  //         address: "0x2371238740123847102983471022", // address of the account to receive the newly minted tokens
+  //         address: "0x6c844CAdCd636130397f3d44796045d8BB4A70Dc", // address of the account to receive the newly minted tokens
   //         balance: BigInt(10), // amount of tokens that address should receive
   //       },
   //       {
-  //         address: "0x0237123874012384710298347102",
+  //         address: "0x283070d8D9ff69fCC9f84afE7013C1C32Fd5A19F",
   //         balance: BigInt(10),
   //       },
   //       {
-  //         address: "0x2237123874012384710298347102",
+  //         address: "0xe3be75e256a92725Ae82E8FB72AE7794382f4F11",
   //         balance: BigInt(10),
   //       },
   //     ],
@@ -136,15 +137,20 @@ export const createDAO = async (client: Client) => {
 
   const createParams: CreateDaoParams = {
     metadataUri,
-    ensSubdomain: "votedao12304", // my-org.dao.eth
+    ensSubdomain: "votingdao" + Math.floor(Math.random() * 42069), // my-org.dao.eth
     plugins: [multisigPluginInstallItem, tokenVotingPluginInstallItem1],
   };
 
-  console.log("before estimation");
+  console.log("before estimation", createParams);
 
-  // Estimate gas for the transaction.
-  const estimatedGas: GasFeeEstimation = await client.estimation.createDao(createParams);
-  console.log({ avg: estimatedGas.average, max: estimatedGas.max });
+  try {
+    // Estimate gas for the transaction.
+    const estimatedGas: GasFeeEstimation = await client.estimation.createDao(createParams);
+    console.log({ avg: estimatedGas.average, max: estimatedGas.max });
+  } catch (ex: any) {
+    console.log("Error: ", ex);
+    console.log("ENS Subdomain Already exist");
+  }
 
   let daoAddress: string | undefined;
   let pluginAddresses: Array<string> | undefined;
