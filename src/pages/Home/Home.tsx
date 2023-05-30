@@ -7,6 +7,7 @@ import { checkVotingRights } from "src/utils/checkVotingRights";
 
 import { useAragon } from "src/context/AragonProvider";
 import { vote } from "src/utils/vote";
+import { getProposal } from "src/utils/getProposal";
 
 const Home: React.FC = () => {
   const { context, baseClient, currentAddress } = useAragon();
@@ -34,6 +35,9 @@ const Home: React.FC = () => {
       }
     }
   };
+  const getProposalDetailsHandler = async () => {
+    if (context) getProposal(context, proposalId);
+  };
   const voteHandler = async () => {
     if (proposalId && context && currentAddress) {
       (await checkVotingRights(context, proposalId, currentAddress))
@@ -50,6 +54,9 @@ const Home: React.FC = () => {
       </Button>
       <Button disabled={!dao.plugin?.length} variant="contained" sx={{ mr: 2 }} onClick={createProposalHandler}>
         Create Proposal
+      </Button>
+      <Button disabled={!proposalId} variant="contained" sx={{ mr: 2 }} onClick={getProposalDetailsHandler}>
+        Get Proposal Details
       </Button>
       <Button disabled={!proposalId} variant="contained" sx={{ mr: 2 }} onClick={voteHandler}>
         Vote

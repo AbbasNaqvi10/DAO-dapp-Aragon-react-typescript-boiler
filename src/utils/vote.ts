@@ -6,6 +6,7 @@ import {
   VoteValues,
   Context,
 } from "@aragon/sdk-client";
+import { checkExecution } from "./checkExecution";
 
 export const vote = async (context: Context, proposalId: string) => {
   // Instantiate a plugin context from the Aragon OSx SDK context.
@@ -32,6 +33,7 @@ export const vote = async (context: Context, proposalId: string) => {
         case VoteProposalStep.DONE:
           voted = true;
           console.log("Voted");
+          checkExecution(context, proposalId);
           break;
       }
     } catch (err) {

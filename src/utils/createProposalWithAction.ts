@@ -27,8 +27,8 @@ export const createProposalWithAction = async (context: Context, pluginAddresses
   // In this example, we are creating an action to change the settings of a governance plugin to demonstrate how to set it up.
   const configActionParams: VotingSettings = {
     minDuration: 60 * 60 * 24 * 2, // seconds
-    minParticipation: 0.25, // 25%
-    supportThreshold: 0.5, // 50%
+    minParticipation: 0.01, // 25%
+    supportThreshold: 0.01, // 50%
     minProposerVotingPower: BigInt("0"), // default 0
     votingMode: VotingMode.STANDARD, // default STANDARD, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
   };
@@ -88,15 +88,14 @@ export const createProposalWithAction = async (context: Context, pluginAddresses
 
   // const metadataUri = res.data.IpfsHash;
 
-  let endDate = new Date(new Date(0).getTime() + 60 * 60 * 60 * 24);
   const proposalParams: CreateMajorityVotingProposalParams = {
     pluginAddress: pluginAddresses[1], // the address of the TokenVoting plugin contract containing all plugin logic.
     metadataUri,
     actions: [updatePluginSettingsAction], // optional, if none, leave an empty array `[]`
-    startDate: new Date(0),
-    endDate: new Date(0),
+    // startDate: new Date(0),
+    // endDate: new Date(0),
     executeOnPass: false,
-    creatorVote: VoteValues.YES, // default NO, other options: ABSTAIN, YES
+    // creatorVote: VoteValues.YES, // default NO, other options: ABSTAIN, YES
   };
 
   // Get the token details used in the TokenVoting plugin for a given DAO.
