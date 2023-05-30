@@ -8,6 +8,7 @@ export interface AragonSDKContextValue {
   context?: Context;
   baseClient?: Client;
   tokenVotingClient?: TokenVotingClient;
+  currentAddress?: string;
 }
 
 const AragonSDKContext = createContext<AragonSDKContextValue>({});
@@ -17,7 +18,7 @@ const AragonSDKContext = createContext<AragonSDKContextValue>({});
  * to the Aragon SDK.
  */
 export function AragonSDKWrapper({ children, ipfsNodes }: any): JSX.Element {
-  const { signer } = useWallet();
+  const { signer, currentAddress } = useWallet();
   const { chain: CHAIN } = useNetwork();
   const chain = CHAIN?.id ?? 1;
 
@@ -34,6 +35,7 @@ export function AragonSDKWrapper({ children, ipfsNodes }: any): JSX.Element {
       signer,
       ...settings(chain as SupportedChainIds, ipfsNodes),
     };
+
     const contextInstance = new Context(aragonSDKContextParams);
     const contextPlugin = ContextPlugin.fromContext(contextInstance);
     setContext(contextInstance);
@@ -47,6 +49,7 @@ export function AragonSDKWrapper({ children, ipfsNodes }: any): JSX.Element {
         context,
         baseClient,
         tokenVotingClient,
+        currentAddress,
       }}
     >
       {children}

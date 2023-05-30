@@ -9,7 +9,6 @@ import {
   VotingSettings,
   Context,
 } from "@aragon/sdk-client";
-import axios from "axios";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 
@@ -21,6 +20,7 @@ export const createProposalWithAction = async (context: Context, pluginAddresses
 
   // The contract address of the token voting plugin you have installed in your DAO
   const pluginAddress: string = pluginAddresses[1];
+  console.log("voting plugin address", pluginAddress);
 
   // Update
   // [Optional] In case you wanted to pass an action to the proposal, you can configure it here and pass it immediately. An action is the encoded transaction which will get executed when a proposal passes.
@@ -41,7 +41,7 @@ export const createProposalWithAction = async (context: Context, pluginAddresses
   console.log("before metadatauri");
 
   const metadataUri: string = await tokenVotingClient.methods.pinMetadata({
-    title: "Test proposal",
+    title: "Test proposal" + Math.floor(Math.random() * 42069),
     summary: "This is a test proposal",
     description: "This is the description of a long test proposal",
     resources: [
@@ -55,8 +55,6 @@ export const createProposalWithAction = async (context: Context, pluginAddresses
       logo: "https://fileserver.com/logo.png",
     },
   });
-
-  console.log("after metadatauri");
   console.log("metadata Uri: ", metadataUri);
   // const formData = new FormData();
   // const metadata = {
@@ -90,13 +88,13 @@ export const createProposalWithAction = async (context: Context, pluginAddresses
 
   // const metadataUri = res.data.IpfsHash;
 
-  let endDate = new Date(new Date().getTime() + 60 * 60 * 60 * 24);
+  let endDate = new Date(new Date(0).getTime() + 60 * 60 * 60 * 24);
   const proposalParams: CreateMajorityVotingProposalParams = {
     pluginAddress: pluginAddresses[1], // the address of the TokenVoting plugin contract containing all plugin logic.
     metadataUri,
     actions: [updatePluginSettingsAction], // optional, if none, leave an empty array `[]`
-    startDate: new Date(),
-    endDate: endDate,
+    startDate: new Date(0),
+    endDate: new Date(0),
     executeOnPass: false,
     creatorVote: VoteValues.YES, // default NO, other options: ABSTAIN, YES
   };

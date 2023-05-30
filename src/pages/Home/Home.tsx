@@ -3,16 +3,18 @@ import { Button, Container } from "@mui/material";
 
 import { createDAO } from "src/utils/createDAO";
 import { createProposalWithAction } from "src/utils/createProposalWithAction";
+import { checkVotingRights } from "src/utils/checkVotingRights";
 
 import { useAragon } from "src/context/AragonProvider";
+import { vote } from "src/utils/vote";
 
 const Home: React.FC = () => {
-  const { context, baseClient } = useAragon();
+  const { context, baseClient, currentAddress } = useAragon();
   const [dao, setDao] = useState<{ address: string | undefined; plugin: Array<string> | undefined }>({
     address: "",
     plugin: [],
   });
-  const [proposalId, setProposalId] = useState([]);
+  const [proposalId, setProposalId] = useState("");
 
   const createDAOHandler = async () => {
     if (baseClient) {
@@ -26,9 +28,18 @@ const Home: React.FC = () => {
     if (baseClient && context && dao.plugin) {
       console.log("daoAddress", dao.address);
       console.log("pluginAddresses", dao.plugin);
-      await createProposalWithAction(context, dao.plugin);
-      // setProposalId(proposalId => [...proposalId, await createProposalWithAction(context, dao.plugin)]);
+      const propId = await createProposalWithAction(context, dao.plugin);
+      if (propId) {
+        setProposalId(propId);
+      }
     }
+  };
+  const voteHandler = async () => {
+    if (proposalId && context && currentAddress) {
+      (await checkVotingRights(context, proposalId, currentAddress))
+        ? vote(context, proposalId)
+        : console.log("Not having voting rights");
+    } else console.log("No proposal found");
   };
 
   return (
@@ -37,8 +48,11 @@ const Home: React.FC = () => {
       <Button disabled={!baseClient} variant="contained" sx={{ mr: 2 }} onClick={createDAOHandler}>
         Create DAO
       </Button>
-      <Button disabled={!baseClient} variant="contained" sx={{ mr: 2 }} onClick={createProposalHandler}>
+      <Button disabled={!dao.plugin?.length} variant="contained" sx={{ mr: 2 }} onClick={createProposalHandler}>
         Create Proposal
+      </Button>
+      <Button disabled={!proposalId} variant="contained" sx={{ mr: 2 }} onClick={voteHandler}>
+        Vote
       </Button>
     </Container>
   );
