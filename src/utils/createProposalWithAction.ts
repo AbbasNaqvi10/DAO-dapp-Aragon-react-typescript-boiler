@@ -12,14 +12,14 @@ import {
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 
-export const createProposalWithAction = async (context: Context, pluginAddresses: Array<string>) => {
+export const createProposalWithAction = async (context: Context, pluginAddresses: string) => {
   const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
   // Create a TokenVoting client.
   const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
   // The contract address of the token voting plugin you have installed in your DAO
-  const pluginAddress: string = pluginAddresses[1];
+  const pluginAddress: string = pluginAddresses;
   console.log("voting plugin address", pluginAddress);
 
   // Update
@@ -27,10 +27,10 @@ export const createProposalWithAction = async (context: Context, pluginAddresses
   // In this example, we are creating an action to change the settings of a governance plugin to demonstrate how to set it up.
   const configActionParams: VotingSettings = {
     minDuration: 60 * 60 * 24 * 2, // seconds
-    minParticipation: 0.01, // 25%
-    supportThreshold: 0.01, // 50%
-    minProposerVotingPower: BigInt("0"), // default 0
-    votingMode: VotingMode.STANDARD, // default STANDARD, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
+    minParticipation: 0.5, // 25%
+    supportThreshold: 0.1, // 50%
+    minProposerVotingPower: BigInt("249"), // default 0
+    votingMode: VotingMode.EARLY_EXECUTION, // default STANDARD, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
   };
   // We need to encode the action so it can executed once the proposal passes.
   const updatePluginSettingsAction: DaoAction = tokenVotingClient.encoding.updatePluginSettingsAction(
@@ -89,7 +89,7 @@ export const createProposalWithAction = async (context: Context, pluginAddresses
   // const metadataUri = res.data.IpfsHash;
 
   const proposalParams: CreateMajorityVotingProposalParams = {
-    pluginAddress: pluginAddresses[1], // the address of the TokenVoting plugin contract containing all plugin logic.
+    pluginAddress: pluginAddresses, // the address of the TokenVoting plugin contract containing all plugin logic.
     metadataUri,
     actions: [updatePluginSettingsAction], // optional, if none, leave an empty array `[]`
     // startDate: new Date(0),
@@ -100,7 +100,7 @@ export const createProposalWithAction = async (context: Context, pluginAddresses
 
   // Get the token details used in the TokenVoting plugin for a given DAO.
   // ERC721 Token coming soon!
-  const tokenDetails = await tokenVotingClient.methods.getToken(pluginAddresses[1]);
+  const tokenDetails = await tokenVotingClient.methods.getToken(pluginAddresses);
   console.log("Token details", tokenDetails);
 
   // Creates a proposal using the token voting governance mechanism, which executes with the parameters set in the configAction object.
