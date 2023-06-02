@@ -1,119 +1,137 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Container, Button, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
-import { DAO } from "../../interface/interfaces";
-import { FetchDaoByAddress } from "src/utils/fetchDao";
+import { useAragon } from "src/context/AragonProvider";
+import { DAO, Proposals } from "../../interface/interfaces";
+import { FetchProposalsByDaoAddress } from "src/utils/fetchProposals";
+import { createProposalWithAction } from "src/utils/createProposalWithAction";
+import { checkVotingRights } from "../../utils/checkVotingRights";
+import { vote } from "../../utils/vote";
+import { useAppDispatch, useAppSelector } from "src/state";
 
-interface Action {
-  id: string;
-  data: string;
-  value: string;
-  to: string;
-}
-
-interface Proposal {
-  id: string;
-  actions: Action[];
-  creator: string;
-  endDate: string;
-  metadata: string;
-  startDate: string;
-}
-
-interface Props {
-  daoAddress: string;
-}
-
-const ProposalPage: React.FC<Props> = (props: Props) => {
-  const [dao, setDao] = useState<DAO | null>(null);
+const ProposalPage: React.FC = () => {
+  const { context, currentAddress } = useAragon();
+  const [proposals, setProposals] = useState<Proposals[] | null>(null);
+  const [isProposalCreated, setIsProposalCreated] = useState<boolean>(false);
+  const daoFromStore = useAppSelector((store) => store.dao.dao);
+  const { daoAddress } = useParams();
 
   useEffect(() => {
-    if (props.daoAddress) {
-      FetchDaoByAddress(props.daoAddress)
-        .then((daoDetails) => {
-          setDao(daoDetails);
-          console.log(daoDetails);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+    const fetchProposalByDAO = async () => {
+      try {
+        if (daoAddress) {
+          console.log(daoFromStore);
+          const proposalsDetails = await FetchProposalsByDaoAddress(daoAddress);
+          setProposals(proposalsDetails);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    if (daoAddress) {
+      fetchProposalByDAO();
     }
-  }, [props.daoAddress]);
-
+  }, [daoAddress]);
+  useEffect(() => {
+    const fetchProposalByDAO = async () => {
+      try {
+        if (daoFromStore) {
+          console.log(daoFromStore);
+          const proposalsDetails = await FetchProposalsByDaoAddress(daoFromStore.id);
+          setProposals(proposalsDetails);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    if (daoFromStore) {
+      fetchProposalByDAO();
+    }
+  }, [daoFromStore, isProposalCreated]);
   const createProposalHandler = async () => {
-    // Implement createProposalHandler logic
+    try {
+      if (context && daoFromStore) {
+        const proposalId = await createProposalWithAction(context, daoFromStore.plugins[0].id);
+        if (proposalId) setIsProposalCreated(true);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const voteHandler = async (proposalId: string) => {
+    try {
+      if (context) {
+        const isVoted = await vote(context, proposalId);
+        console.log(isVoted);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <Container maxWidth="xl">
-      <Typography variant="h1">DAO Details</Typography>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Id</TableCell>
-            <TableCell>Subdomain</TableCell>
-            <TableCell>Metadata</TableCell>
-            <TableCell>Created At</TableCell>
-            <TableCell>Plugins</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {dao && (
-            <TableRow key={dao.id}>
-              <TableCell>{dao.id}</TableCell>
-              <TableCell>{dao.subdomain}</TableCell>
-              <TableCell>{dao.metadata}</TableCell>
-              <TableCell>{dao.createdAt}</TableCell>
-              <TableCell>
-                {dao.plugins.map((plugin: any) => (
-                  <TableCell key={plugin.id}>{plugin.id}</TableCell>
-                ))}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <Typography variant="h1">Proposals Details</Typography>
+      <Typography variant="h5">Proposals Details</Typography>
       <Button variant="contained" sx={{ mr: 2 }} onClick={createProposalHandler}>
         Create Proposal
       </Button>
-      {/* <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Id</TableCell>
-            <TableCell>Action</TableCell>
-            <TableCell>Metadata</TableCell>
-            <TableCell>Created At</TableCell>
-            <TableCell>Creator</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {dao?.proposals.map((proposal) => {
-            const { id, actions, creator } = proposal;
-            return (
-              <React.Fragment key={id}>
-                <TableRow>
-                  <TableCell colSpan={5}>
-                    <Typography variant="h2">Proposal ID: {id}</Typography>
-                  </TableCell>
-                </TableRow>
-                {actions > 0 &&
-                  actions.map((action: Action, index: number) => {
-                    const { id: actionId, data, value, to } = action;
-                    return (
-                      <TableRow key={index}>
-                        <TableCell>{actionId}</TableCell>
-                        <TableCell>{data}</TableCell>
-                        <TableCell>{value}</TableCell>
-                        <TableCell>{to}</TableCell>
-                        <TableCell>{creator}</TableCell>
-                      </TableRow>
-                    );
-                  })}
-              </React.Fragment>
-            );
-          })}
-        </TableBody>
-      </Table> */}
+      {context && currentAddress && (
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Id</TableCell>
+              <TableCell>Creator</TableCell>
+              <TableCell>Metadata</TableCell>
+              <TableCell>Start Date</TableCell>
+              <TableCell>End Date</TableCell>
+              <TableCell>Actions</TableCell>
+              <TableCell>Action Id</TableCell>
+              <TableCell>Action Data</TableCell>
+              <TableCell>Action Value</TableCell>
+              <TableCell>Action To</TableCell>
+              <TableCell>Vote</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {proposals?.map((data) => (
+              <TableRow key={data.id}>
+                <TableCell>{data.id}</TableCell>
+                <TableCell>{data.creator}</TableCell>
+                <TableCell>{data.metadata}</TableCell>
+                <TableCell>{data.startDate}</TableCell>
+                <TableCell>{data.endDate}</TableCell>
+                <TableCell>
+                  {data.actions && Array.isArray(data.actions) ? (
+                    <Table size="small">
+                      <TableBody>
+                        {data.actions.map((action) => (
+                          <TableRow key={action.id}>
+                            <TableCell>{action.id}</TableCell>
+                            <TableCell>{action.data}</TableCell>
+                            <TableCell>{action.value}</TableCell>
+                            <TableCell>{action.to}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    "No actions"
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    disabled={!checkVotingRights(context, data.id, currentAddress)}
+                    variant="contained"
+                    onClick={() => voteHandler(data.id)}
+                  >
+                    Vote
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </Container>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Container,
   Button,
@@ -13,21 +14,25 @@ import {
 } from "@mui/material";
 import { useAragon } from "src/context/AragonProvider";
 import { createDAO } from "src/utils/createDAO";
-import { FetchDaoByCreator } from "src/utils/fetchDao";
-import ProposalPage from "../Proposal/Proposal";
+import { FetchDaoByAddress, FetchDaosByCreator } from "src/utils/fetchDao";
 import { DAO, Plugins } from "../../interface/interfaces";
+import { setDao } from "src/state/dao/daoReducer";
+import { useAppDispatch, useAppSelector } from "src/state";
 
 const Home: React.FC = () => {
   const { context, baseClient, currentAddress } = useAragon();
-  const [dao, setDao] = useState<DAO[]>([]);
+  const [daos, setDaos] = useState<DAO[]>([]);
   const [isDaoCreated, setIsDaoCreated] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
+  const daoFromStore = useAppSelector((store) => store.dao.dao);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDaoByCreator = async () => {
       try {
         if (currentAddress) {
-          const daoDetails = await FetchDaoByCreator(currentAddress);
-          setDao(daoDetails);
+          const daosDetails = await FetchDaosByCreator(currentAddress);
+          setDaos(daosDetails);
         }
       } catch (error) {
         console.error(error);
@@ -46,9 +51,16 @@ const Home: React.FC = () => {
     }
   };
 
-  const handleJoinClick = (daoAddress: string, pluginAddresses: Plugins[]) => {
-    // Handle the join button click event
-    // You can use this function to navigate to the ProposalPage or perform any other action
+  const handleJoinClick = async (daoAddress: string, pluginAddresses: Plugins[]) => {
+    try {
+      if (currentAddress) {
+        const daoDetails = await FetchDaoByAddress(daoAddress);
+        dispatch(setDao(daoDetails));
+        navigate(`/proposals/${daoAddress}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
     console.log("Dao address", daoAddress);
     console.log("plugin address", pluginAddresses);
   };
@@ -75,10 +87,10 @@ const Home: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {dao.map((data) => (
+            {daos.map((data) => (
               <TableRow key={data.id}>
-                <TableCell sx={{ minWidth: "100px" }}>{data.id}</TableCell>
-                <TableCell sx={{ minWidth: "100px" }}>{data.subdomain}</TableCell>
+                <TableCell>{data.id}</TableCell>
+                <TableCell>{data.subdomain}</TableCell>
                 <TableCell>{data.metadata}</TableCell>
                 <TableCell>{data.creator}</TableCell>
                 <TableCell>{data.createdAt}</TableCell>

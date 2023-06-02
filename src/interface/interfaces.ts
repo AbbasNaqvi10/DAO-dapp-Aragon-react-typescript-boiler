@@ -11,9 +11,10 @@ export interface Action {
 export interface Proposals {
   id: string;
   creator: string;
+  metadata: string;
   startDate: string;
   endDate: string;
-  actions: Action;
+  actions: Array<Action>;
 }
 export interface DAO {
   id: string;

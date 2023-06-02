@@ -5,12 +5,14 @@ import storage from "redux-persist/lib/storage";
 import decimalsReducer from "./decimals/decimalsReducer";
 import balancesReducer from "./balances/balancesReducer";
 import { reducer as notificationsReducer } from "reapop";
+import daoReducer from "./dao/daoReducer";
 
 const persistedDecimalReducer = persistReducer({ key: "decimals", version: 1, storage }, decimalsReducer);
 
 const rootReducer = combineReducers({
   notifications: notificationsReducer(),
   balances: balancesReducer,
+  dao: daoReducer,
   decimals: persistedDecimalReducer,
 });
 
@@ -37,3 +39,4 @@ export const persistor = persistStore(store);
 export type AppDispatch = typeof store.dispatch;
 export const useAppDispatch = () => useDispatch<AppDispatch>(); // Export a hook that can be reused to resolve types
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+

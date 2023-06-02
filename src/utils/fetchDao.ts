@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const FetchAllDao = (address: string): Promise<any> => {
+export const FetchAllDao = (): Promise<any> => {
   return new Promise((resolve, reject) => {
     const query = `  query Dao {
       daos{
@@ -74,7 +74,7 @@ export const FetchDaoByAddress = (address: string): Promise<any> => {
       .then((response) => {
         const daoDetails = response.data;
         console.log("DAO: ", daoDetails);
-        resolve(daoDetails);
+        resolve(daoDetails.data.dao);
       })
       .catch((error) => {
         reject(error);
@@ -82,7 +82,7 @@ export const FetchDaoByAddress = (address: string): Promise<any> => {
   });
 };
 
-export const FetchDaoByCreator = (address: string): Promise<any> => {
+export const FetchDaosByCreator = (address: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     const query = `query Dao {
       daos(where: {creator: "${address}"}){
