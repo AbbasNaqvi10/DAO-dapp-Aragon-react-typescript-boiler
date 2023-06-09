@@ -8,7 +8,9 @@ import {
   VotingMode,
   VotingSettings,
   Context,
+  ProposalMetadata,
 } from "@aragon/sdk-client";
+import { ethers } from "ethers";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 
@@ -32,13 +34,45 @@ export const createProposalWithAction = async (context: Context, pluginAddresses
     minProposerVotingPower: BigInt("249"), // default 0
     votingMode: VotingMode.EARLY_EXECUTION, // default STANDARD, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
   };
+  let ABI = [
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_to",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "_value",
+          type: "uint256",
+        },
+      ],
+      name: "mint",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+  ];
+  let iface = new ethers.utils.Interface(ABI);
+
   // We need to encode the action so it can executed once the proposal passes.
   const updatePluginSettingsAction: DaoAction = tokenVotingClient.encoding.updatePluginSettingsAction(
     pluginAddress,
     configActionParams
   );
 
-  console.log("before metadatauri");
+  const transferAction: DaoAction = {
+    to: "0xD217BDE2332d7f902e913d5567f4b1e56AEa6bd9".toLowerCase(),
+    value: BigInt(0),
+    data: ethers.utils.arrayify(
+      iface.encodeFunctionData("mint", ["0x8be54244f479A99758e88fb29B0955CD083a8a38", ethers.utils.parseEther("10")])
+    ),
+  };
+
+  console.log("actions: ", transferAction);
+  console.log("encoded: ", updatePluginSettingsAction);
+  console.log("plugin address: ", pluginAddress);
 
   const metadataUri: string = await tokenVotingClient.methods.pinMetadata({
     title: "Test proposal" + Math.floor(Math.random() * 42069),
@@ -91,7 +125,7 @@ export const createProposalWithAction = async (context: Context, pluginAddresses
   const proposalParams: CreateMajorityVotingProposalParams = {
     pluginAddress: pluginAddresses, // the address of the TokenVoting plugin contract containing all plugin logic.
     metadataUri,
-    actions: [updatePluginSettingsAction], // optional, if none, leave an empty array `[]`
+    actions: [transferAction], // optional, if none, leave an empty array `[]`
     // startDate: new Date(0),
     // endDate: new Date(0),
     executeOnPass: false,

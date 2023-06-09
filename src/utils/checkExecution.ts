@@ -1,4 +1,5 @@
 import { Context, ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
+import { executeProposal } from "./execute";
 
 export const checkExecution = async (context: Context, proposalId: string) => {
   // Instantiate a plugin context from the Aragon OSx SDK context.
@@ -8,5 +9,8 @@ export const checkExecution = async (context: Context, proposalId: string) => {
 
   // Checks whether the signer of the transaction can execute a given proposal.
   const canExecute = await tokenVotingClient.methods.canExecute(proposalId);
+  if (canExecute) {
+    executeProposal(context, proposalId);
+  }
   console.log("can execute? ", canExecute);
 };

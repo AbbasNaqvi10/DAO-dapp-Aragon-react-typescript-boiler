@@ -17,11 +17,11 @@ export const createDAO = async (client: Client) => {
       minParticipation: 0.25, // 25%
       supportThreshold: 0.5, // 50%
       // minProposerVotingPower: BigInt("5000"), // default 0
-      votingMode: VotingMode.STANDARD, // default is STANDARD. other options: EARLY_EXECUTION, VOTE_REPLACEMENT
+      votingMode: VotingMode.EARLY_EXECUTION, // default is STANDARD. other options: EARLY_EXECUTION, VOTE_REPLACEMENT
     },
     newToken: {
-      name: "Wrapped newToken", // the name of your token
-      symbol: "WNTK", // the symbol for your token. shouldn't be more than 5 letters
+      name: "WWrapped newToken", // the name of your token
+      symbol: "WWWWNTK", // the symbol for your token. shouldn't be more than 5 letters
       decimals: 18, // the number of decimals your token uses
       minter: "0x6bd965c02a598ABEc0E9441F05224021464063Ce", // optional. if you don't define any, we'll use the standard OZ ERC20 contract. Otherwise, you can define your own token minter contract address.
       balances: [
@@ -129,10 +129,7 @@ export const createDAO = async (client: Client) => {
         case DaoCreationSteps.DONE:
           daoAddress = step.address;
           pluginAddresses = step.pluginAddresses;
-          console.log({
-            daoAddress: step.address,
-            pluginAddresses: step.pluginAddresses,
-          });
+          console.log(step);
           break;
       }
     } catch (err) {
